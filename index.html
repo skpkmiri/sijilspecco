@@ -241,11 +241,7 @@
             fontProgram: 32
         };
 
-        // Senarai Program mengikut Jenis
-        const senaraiKategori = {
-            "Sijil Penyertaan": ["Semarak Seni", "Petanque", "English Carnival - Spelling bee", "English Carnival - English Quiz", "English Carnival - Jazz Chants", "English Carnival - Treasure Hunt", "English Carnival - Best Costumes", "English Carnival - English Kolam"],
-            "Sijil Pencapaian": ["Semarak Seni", "Petanque", "English Carnival - Spelling bee", "English Carnival - English Quiz", "English Carnival - Jazz Chants", "English Carnival - Treasure Hunt", "English Carnival - Best Costumes", "English Carnival - English Kolam"]
-        };
+        // Senarai kategori dan program kini dijana secara dinamik dari data CSV
 
         window.showLoading = (text) => {
             document.getElementById('loading-text').innerText = text;
@@ -310,7 +306,18 @@
         };
 
         const populateBorang = () => {
-            // Tiada tindakan, biarkan jenis sijil kosong pada mulanya
+            const selectJenis = document.getElementById('carian-jenis');
+            selectJenis.innerHTML = '<option value="">-- Pilih Jenis Sijil --</option>';
+            
+            // Ambil jenis sijil unik terus dari data (cth: Sijil Penyertaan, Sijil Pencapaian, dll)
+            const jenisUnik = [...new Set(window.semuaPeserta.map(p => p.jenis).filter(Boolean))];
+            
+            jenisUnik.sort().forEach(jenis => {
+                const opt = document.createElement('option');
+                opt.value = jenis;
+                opt.innerText = jenis;
+                selectJenis.appendChild(opt);
+            });
         };
 
         window.updateProgramList = () => {
@@ -322,8 +329,15 @@
             selectNama.innerHTML = '<option value="">-- Sila Pilih Program Dahulu --</option>';
             selectNama.disabled = true;
 
-            if (jenis && senaraiKategori[jenis]) {
-                senaraiKategori[jenis].forEach(prog => {
+            if (jenis) {
+                // Ambil program unik dari data berdasarkan jenis sijil yang dipilih
+                const programUnik = [...new Set(window.semuaPeserta
+                    .filter(p => p.jenis === jenis)
+                    .map(p => p.program)
+                    .filter(Boolean)
+                )];
+
+                programUnik.sort().forEach(prog => {
                     const opt = document.createElement('option');
                     opt.value = prog;
                     opt.innerText = prog;
